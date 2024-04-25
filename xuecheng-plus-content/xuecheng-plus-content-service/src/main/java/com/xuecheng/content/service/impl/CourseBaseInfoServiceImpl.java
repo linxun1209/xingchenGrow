@@ -10,6 +10,7 @@ import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
+import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseCategory;
@@ -180,39 +181,100 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     }
 
     //单独写一个方法保存营销信息，逻辑：存在则更新，不存在则添加
-    private int saveCourseMarket(CourseMarket courseMarketNew){
+
+    //查询课程信息
+    public CourseBaseInfoDto getCourseBaseInfo(Long courseId){
+
+        //从课程基本信息表查询
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase==null){
+            return null;
+        }
+        //从课程营销表查询
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+
+        //组装在一起
+        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+        BeanUtils.copyProperties(courseBase,courseBaseInfoDto);
+        if(courseMarket!=null){
+            BeanUtils.copyProperties(courseMarket,courseBaseInfoDto);
+        }
+
+        //通过courseCategoryMapper查询分类信息，将分类名称放在courseBaseInfoDto对象
+        //todo：课程分类的名称设置到courseBaseInfoDto
+
+        return courseBaseInfoDto;
+
+    }
+
+    @Override
+    public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
+
+        //拿到课程id
+        Long courseId = editCourseDto.getId();
+        //查询课程信息
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase == null){
+            XueChengPlusException.cast("课程不存在");
+        }
+
+        //数据合法性校验
+        //根据具体的业务逻辑去校验
+        //本机构只能修改本机构的课程
+        if(!companyId.equals(courseBase.getCompanyId())){
+            XueChengPlusException.cast("本机构只能修改本机构的课程");
+        }
+
+        //封装数据
+        BeanUtils.copyProperties(editCourseDto,courseBase);
+        //修改时间
+        courseBase.setChangeDate(LocalDateTime.now());
+
+        //更新数据库
+        int i = courseBaseMapper.updateById(courseBase);
+        if(i<=0){
+            XueChengPlusException.cast("修改课程失败");
+        }
+        //更新营销信息
+        //todo:更新营销信息
+        //查询课程信息
+        CourseBaseInfoDto courseBaseInfo = getCourseBaseInfo(courseId);
+
+        return courseBaseInfo;
+    }
+
+    //单独写一个方法保存营销信息，逻辑：存在则更新，不存在则添加
+    private int saveCourseMarket(CourseMarket courseMarketNew) {
 
         //参数的合法性校验
         String charge = courseMarketNew.getCharge();
-        if(StringUtils.isEmpty(charge)){
+        if (StringUtils.isEmpty(charge)) {
             throw new RuntimeException("收费规则为空");
         }
         //如果课程收费，价格没有填写也需要抛出异常
-        if(charge.equals("201001")){
-           if(courseMarketNew.getPrice() ==null || courseMarketNew.getPrice().floatValue()<=0){
-               XueChengPlusException.cast("课程的价格不能为空并且必须大于0");
-           }
+        if (charge.equals("201001")) {
+            if (courseMarketNew.getPrice() == null || courseMarketNew.getPrice().floatValue() <= 0) {
+//               throw new RuntimeException("课程的价格不能为空并且必须大于0");
+                XueChengPlusException.cast("课程的价格不能为空并且必须大于0");
+            }
         }
 
         //从数据库查询营销信息,存在则更新，不存在则添加
         Long id = courseMarketNew.getId();//主键
         CourseMarket courseMarket = courseMarketMapper.selectById(id);
-        if(courseMarket == null){
+        if (courseMarket == null) {
             //插入数据库
             int insert = courseMarketMapper.insert(courseMarketNew);
             return insert;
-        }else{
+        } else {
             //将courseMarketNew拷贝到courseMarket
-            BeanUtils.copyProperties(courseMarketNew,courseMarket);
+            BeanUtils.copyProperties(courseMarketNew, courseMarket);
             courseMarket.setId(courseMarketNew.getId());
             //更新
             int i = courseMarketMapper.updateById(courseMarket);
             return i;
         }
 
-
     }
-
-
 
 }
