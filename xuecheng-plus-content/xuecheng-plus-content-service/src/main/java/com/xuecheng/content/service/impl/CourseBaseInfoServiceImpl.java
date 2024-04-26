@@ -5,16 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.*;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
-import com.xuecheng.content.model.po.CourseBase;
-import com.xuecheng.content.model.po.CourseCategory;
-import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -42,6 +39,15 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Autowired
     CourseCategoryMapper courseCategoryMapper;
+
+    @Resource
+    CourseTeacherMapper courseTeacherMapper;
+
+    @Resource
+    TeachplanMediaMapper teachplanMediaMapper;
+
+    @Autowired
+    TeachplanMapper teachplanMapper;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto courseParamsDto) {
@@ -271,5 +277,40 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         }
 
     }
+
+
+    @Transactional
+    @Override
+    public void deleteCourseBase(Long courseId) {
+        LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CourseBase::getId, courseId);
+        CourseBase courseBase = courseBaseMapper.selectOne(queryWrapper);
+        String status = courseBase.getStatus();
+        if (!status.equals("203001")) {
+            throw new XueChengPlusException("课程未处于未提交状态，无法删除");
+        }
+        //courseteacher 找courseid再删
+        LambdaQueryWrapper<CourseTeacher> query3 = new LambdaQueryWrapper<>();
+        query3.eq(CourseTeacher::getCourseId, courseId);
+        courseTeacherMapper.delete(query3);
+
+        //teachplanmedia 找courseid再删
+        LambdaQueryWrapper<TeachplanMedia> query2 = new LambdaQueryWrapper<>();
+        query2.eq(TeachplanMedia::getCourseId, courseId);
+        teachplanMediaMapper.delete(query2);
+
+        //teachplan 找courseid再删
+        LambdaQueryWrapper<Teachplan> query1 = new LambdaQueryWrapper<>();
+        query1.eq(Teachplan::getCourseId, courseId);
+        teachplanMapper.delete(query1);
+
+        //coursebase 删id
+        //coursemarket 删id
+        Long id = courseBase.getId();
+        courseMarketMapper.deleteById(id);
+        courseBaseMapper.deleteById(id);
+    }
+
+
 
 }

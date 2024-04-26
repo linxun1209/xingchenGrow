@@ -47,5 +47,11 @@ public interface CourseBaseInfoService {
      */
     public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
 
-
+    /**
+     * @description 删除课程信息
+     * @param courseId 课程信息
+     * @author xiaoming
+     * @date 2023/1/31 13:11
+     */
+    public void deleteCourseBase(Long courseId);
 }
