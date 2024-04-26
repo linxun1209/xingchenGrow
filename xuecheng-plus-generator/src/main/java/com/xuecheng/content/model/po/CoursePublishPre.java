@@ -1,6 +1,6 @@
 package com.xuecheng.content.model.po;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
@@ -114,12 +114,12 @@ public class CoursePublishPre implements Serializable {
      * 提交时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createDate;
+    private Date createDate;
 
     /**
      * 审核时间
      */
-    private LocalDateTime auditDate;
+    private Date auditDate;
 
     /**
      * 状态

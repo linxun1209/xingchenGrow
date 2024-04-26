@@ -9,7 +9,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Xingchen
@@ -33,14 +33,14 @@ public class MybatisPlusConfig implements MetaObjectHandler {
 
  @Override
  public void insertFill(MetaObject metaObject) {
-  setFieldValByName("createDate", new Date(), metaObject);
-  setFieldValByName("createTime", new Date(), metaObject);
-  setFieldValByName("dealTime", new Date(), metaObject);
+  setFieldValByName("createDate", LocalDateTime.now(), metaObject);
+  setFieldValByName("createTime", LocalDateTime.now(), metaObject);
+  setFieldValByName("dealTime", LocalDateTime.now(), metaObject);
  }
 
  @Override
  public void updateFill(MetaObject metaObject) {
-  setFieldValByName("changeDate", new Date(), metaObject);
+  setFieldValByName("changeDate", LocalDateTime.now(), metaObject);
  }
 
 }

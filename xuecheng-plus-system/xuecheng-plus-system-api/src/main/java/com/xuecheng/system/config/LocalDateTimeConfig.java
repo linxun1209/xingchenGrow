@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
@@ -14,7 +14,7 @@ public class LocalDateTimeConfig {
 
     /*
      * 序列化内容
-     *   LocalDateTime -> String
+     *   Date -> String
      * 服务端返回给客户端内容
      * */
     @Bean
@@ -24,7 +24,7 @@ public class LocalDateTimeConfig {
 
     /*
      * 反序列化内容
-     *   String -> LocalDateTime
+     *   String -> Date
      * 客户端传入服务端数据
      * */
     @Bean
@@ -37,8 +37,8 @@ public class LocalDateTimeConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return builder -> {
-            builder.serializerByType(LocalDateTime.class, localDateTimeSerializer());
-            builder.deserializerByType(LocalDateTime.class, localDateTimeDeserializer());
+            builder.serializerByType(Date.class, localDateTimeSerializer());
+            builder.deserializerByType(Date.class, localDateTimeDeserializer());
         };
     }
 

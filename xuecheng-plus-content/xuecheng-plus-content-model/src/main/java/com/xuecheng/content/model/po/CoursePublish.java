@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -125,7 +126,7 @@ public class CoursePublish implements Serializable {
     /**
      * 下架时间
      */
-    private LocalDateTime offlineDate;
+    private Date offlineDate;
 
     /**
      * 发布状态

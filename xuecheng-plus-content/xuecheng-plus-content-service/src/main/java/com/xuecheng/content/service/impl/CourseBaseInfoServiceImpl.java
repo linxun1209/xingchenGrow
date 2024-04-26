@@ -23,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resources;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -111,7 +109,6 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //上边的从原始对象中get拿数据向新对象set，比较复杂
         BeanUtils.copyProperties(dto,courseBaseNew);//只要属性名称一致就可以拷贝
         courseBaseNew.setCompanyId(companyId);
-        courseBaseNew.setCreateDate(LocalDateTime.now());
         //审核状态默认为未提交
         courseBaseNew.setAuditStatus("202002");
         //发布状态为未发布
@@ -227,8 +224,6 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
         //封装数据
         BeanUtils.copyProperties(editCourseDto,courseBase);
-        //修改时间
-        courseBase.setChangeDate(LocalDateTime.now());
 
         //更新数据库
         int i = courseBaseMapper.updateById(courseBase);

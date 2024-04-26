@@ -2,7 +2,7 @@ package com.xuecheng.content.model.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
@@ -48,12 +48,12 @@ public class Teachplan implements Serializable {
     /**
      * 开始直播时间
      */
-    private LocalDateTime startTime;
+    private Date startTime;
 
     /**
      * 直播结束时间
      */
-    private LocalDateTime endTime;
+    private Date endTime;
 
     /**
      * 章节及课程时介绍
@@ -94,13 +94,13 @@ public class Teachplan implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createDate;
+    private Date createDate;
 
     /**
      * 修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime changeDate;
+    private Date changeDate;
 
 
 }

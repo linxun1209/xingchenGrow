@@ -37,4 +37,33 @@ import java.util.List;
     public void saveTeachplan(@RequestBody SaveTeachplanDto teachplan) {
         teachplanService.saveTeachplan(teachplan);
     }
+
+
+
+    @ApiOperation("课程计划删除")
+    @DeleteMapping("/{id}")
+    public List<TeachplanDto> deleteTeachplan(@PathVariable Long id){
+        return teachplanService.deleteTeachplan(id);
+    }
+
+
+    @ApiOperation("课程计划上移")
+    @PostMapping("/moveup/{id}")
+    public void moveup(@PathVariable Long id){
+        teachplanService.moveup(id);
+    }
+
+    @ApiOperation("课程计划下移")
+    @PostMapping("/movedown/{id}")
+    public void movedown(@PathVariable Long id){
+        teachplanService.movedown(id);
+    }
+
+
+    @ApiOperation(value = "移动课程计划")
+    @PostMapping("teachplan/{moveType}/{teachplanId}")
+    public void moveTeachPlan(@PathVariable String moveType,@PathVariable Long teachplanId){
+        teachplanService.moveTeachPlan(teachplanId,moveType);
+    }
+
 }
