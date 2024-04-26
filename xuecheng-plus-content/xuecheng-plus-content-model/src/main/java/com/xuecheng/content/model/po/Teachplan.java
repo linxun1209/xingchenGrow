@@ -3,6 +3,9 @@ package com.xuecheng.content.model.po;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.util.Date;
+
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -91,13 +94,13 @@ public class Teachplan implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createDate;
+    private Date createDate;
 
     /**
      * 修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime changeDate;
+    private Date changeDate;
 
 
 }
