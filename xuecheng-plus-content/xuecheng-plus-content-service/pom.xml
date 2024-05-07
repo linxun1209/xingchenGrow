@@ -49,6 +49,23 @@
            </exclusions>
        </dependency>
 
+
+       <!--添加Nacos 注册中心-->
+       <dependency>
+           <groupId>com.alibaba.cloud</groupId>
+           <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+       </dependency>
+       <dependency>
+           <groupId>com.alibaba.cloud</groupId>
+           <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+       </dependency>
+
+       <dependency>
+           <groupId>org.springframework.cloud</groupId>
+           <artifactId>spring-cloud-starter-bootstrap</artifactId>
+           <version>3.0.4</version>
+       </dependency>
+
        <!-- Spring Boot 集成 log4j2 -->
        <dependency>
            <groupId>org.springframework.boot</groupId>

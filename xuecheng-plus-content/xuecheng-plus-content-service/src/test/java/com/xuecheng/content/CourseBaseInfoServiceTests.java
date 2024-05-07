@@ -12,7 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.SpringVersion;
 
 import java.util.List;
 
@@ -43,5 +45,14 @@ public class CourseBaseInfoServiceTests {
         PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, courseParamsDto);
         System.out.println(courseBasePageResult);
 
+    }
+
+
+    @Test
+    public void getSpringVersion() {
+        String version = SpringVersion.getVersion();
+        String version1 = SpringBootVersion.getVersion();
+        System.out.println(version);
+        System.out.println(version1);
     }
 }
