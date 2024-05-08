@@ -132,78 +132,6 @@ public class MediaFileServiceImpl implements MediaFileService {
 //        return null;
     }
 
-//    @Override
-//    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, byte[] bytes, String folder, String objectName) {
-//
-//
-//        //得到文件的md5值
-//        String fileMd5 = DigestUtils.md5Hex(bytes);
-//
-//        if(StringUtils.isEmpty(folder)){
-//            //自动生成目录的路径 按年月日生成，
-//            folder = getFileFolder(new Date(), true, true, true);
-//        }else if(folder.indexOf("/")<0){
-//            folder = folder+"/";
-//        }
-//        //文件名称
-//        String filename = uploadFileParamsDto.getFilename();
-//
-//        if(StringUtils.isEmpty(objectName)){
-//            //如果objectName为空，使用文件的md5值为objectName
-//            objectName = fileMd5 + filename.substring(filename.lastIndexOf("."));
-//        }
-//
-//        objectName = folder + objectName;
-//
-//        try {
-//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-//            String contentType = uploadFileParamsDto.getContentType();
-//
-//            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-//                    .bucket(bucket_files)
-//                    .object(objectName)
-//                    //InputStream stream, long objectSize 对象大小, long partSize 分片大小(-1表示5M,最大不要超过5T，最多10000)
-//                    .stream(byteArrayInputStream, byteArrayInputStream.available(), -1)
-//                    .contentType(contentType)
-//                    .build();
-//            //上传到minio
-//            minioClient.putObject(putObjectArgs);
-//
-//            //保存到数据库
-//            MediaFiles mediaFiles = mediaFilesMapper.selectById(fileMd5);
-//            if(mediaFiles == null){
-//                mediaFiles = new MediaFiles();
-//
-//                //封装数据
-//                BeanUtils.copyProperties(uploadFileParamsDto,mediaFiles);
-//                mediaFiles.setId(fileMd5);
-//                mediaFiles.setFileId(fileMd5);
-//                mediaFiles.setCompanyId(companyId);
-//                mediaFiles.setFilename(filename);
-//                mediaFiles.setBucket(bucket_files);
-//                mediaFiles.setFilePath(objectName);
-//                mediaFiles.setUrl("/"+bucket_files+"/"+objectName);
-//                mediaFiles.setCreateDate(LocalDateTime.now());
-//                mediaFiles.setStatus("1");
-//                mediaFiles.setAuditStatus("002003");
-//
-//                //插入文件表
-//                mediaFilesMapper.insert(mediaFiles);
-//
-//            }
-//
-//            //准备返回数据
-//            UploadFileResultDto uploadFileResultDto = new UploadFileResultDto();
-//            BeanUtils.copyProperties(mediaFiles,uploadFileResultDto);
-//            return uploadFileResultDto;
-//
-//
-//        } catch (Exception e) {
-//            log.debug("上传文件失败：{}",e.getMessage());
-//        }
-//
-//        return null;
-//    }
 
     /**
      * @param companyId
@@ -247,7 +175,7 @@ public class MediaFileServiceImpl implements MediaFileService {
 
             mediaFiles.setCreateDate(LocalDateTime.now());
             mediaFiles.setStatus("1");
-            mediaFiles.setAuditStatus("002003");
+            mediaFiles.setAuditStatus("002002");
             //保存文件信息到文件表
             int insert = mediaFilesMapper.insert(mediaFiles);
             if (insert < 0) {
@@ -263,9 +191,6 @@ public class MediaFileServiceImpl implements MediaFileService {
                 mediaProcess.setStatus("1");//未处理
                 mediaProcessMapper.insert(mediaProcess);
             }
-
-
-
         }
         return mediaFiles;
     }

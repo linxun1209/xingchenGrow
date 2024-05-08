@@ -79,9 +79,7 @@ public class MediaFilesController {
     @ApiOperation("预览文件")
     @GetMapping("/preview/{mediaId}")
     public RestResponse<String> getPlayUrlByMediaId(@PathVariable String mediaId){
-
         //调用service查询文件的url
-
         MediaFiles mediaFiles = mediaFileService.getFileById(mediaId);
         return RestResponse.success(mediaFiles.getUrl());
     }
