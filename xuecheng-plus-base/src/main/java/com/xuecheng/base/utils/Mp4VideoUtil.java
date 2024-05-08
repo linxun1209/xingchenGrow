@@ -90,9 +90,9 @@ public class Mp4VideoUtil extends VideoUtil {
 //        Process p = builder.start();
 
         //ffmpeg的路径
-        String ffmpeg_path = "D:\\soft\\ffmpeg\\ffmpeg.exe";//ffmpeg的安装位置
+        String ffmpeg_path = "D:\\ffmpeg\\ffmpeg.exe";//ffmpeg的安装位置
         //源avi视频的路径
-        String video_path = "D:\\develop\\bigfile_test\\nacos_01.avi";
+        String video_path = "视频\\11.avi";
         //转换后mp4文件的名称
         String mp4_name = "nacos_01.mp4";
         //转换后mp4文件的路径
