@@ -204,7 +204,11 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         }
 
         //通过courseCategoryMapper查询分类信息，将分类名称放在courseBaseInfoDto对象
-        //todo：课程分类的名称设置到courseBaseInfoDto
+        //向分类的名称查询出来
+        CourseCategory courseCategory = courseCategoryMapper.selectById(courseBase.getMt());//一级分类
+        courseBaseInfoDto.setMtName(courseCategory.getName());
+        CourseCategory courseCategory2 = courseCategoryMapper.selectById(courseBase.getSt());//二级分类
+        courseBaseInfoDto.setStName(courseCategory2.getName());
 
         return courseBaseInfoDto;
 
