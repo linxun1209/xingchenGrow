@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -215,38 +216,38 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     }
 
     @Override
+    @Transactional
     public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
-
-        //拿到课程id
+        // 校验
+        // 课程 id
         Long courseId = editCourseDto.getId();
-        //查询课程信息
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
-        if(courseBase == null){
+        if (courseBase == null) {
             XueChengPlusException.cast("课程不存在");
+            ;
         }
-
-        //数据合法性校验
-        //根据具体的业务逻辑去校验
-        //本机构只能修改本机构的课程
-        if(!companyId.equals(courseBase.getCompanyId())){
+        // 校验本机构只能修改本机构的课程
+        if (!courseBase.getCompanyId().equals(companyId)) {
             XueChengPlusException.cast("本机构只能修改本机构的课程");
         }
+        // 封装基本信息的数据
+        BeanUtils.copyProperties(editCourseDto, courseBase);
 
-        //封装数据
-        BeanUtils.copyProperties(editCourseDto,courseBase);
+        // 更新课程基本信息
+        courseBase.setChangeDate(LocalDateTime.now());
+        courseBaseMapper.updateById(courseBase);
 
-        //更新数据库
-        int i = courseBaseMapper.updateById(courseBase);
-        if(i<=0){
-            XueChengPlusException.cast("修改课程失败");
+        // 封装营销信息的数据
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+        if (courseMarket == null) {
+            courseMarket = new CourseMarket();
         }
-        //更新营销信息
-        //todo:更新营销信息
-        //查询课程信息
-        CourseBaseInfoDto courseBaseInfo = getCourseBaseInfo(courseId);
-
-        return courseBaseInfo;
+        BeanUtils.copyProperties(editCourseDto, courseMarket);
+        int update = this.saveCourseMarket(courseMarket);
+        // 查询课程信息并返回
+        return getCourseBaseInfo(courseId);
     }
+
 
     //单独写一个方法保存营销信息，逻辑：存在则更新，不存在则添加
     private int saveCourseMarket(CourseMarket courseMarketNew) {
