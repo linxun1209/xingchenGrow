@@ -6,9 +6,6 @@
 spring:
   application:
     name: system-api
-  #  mvc:
-  #    pathmatch:
-  #      matching-strategy: ANT_PATH_MATCHER
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
@@ -21,13 +18,18 @@ spring:
         file-extension: yaml
         refresh-enabled: true
         extension-configs:
-          - data-id: system-service-dev.yaml
+          - data-id: system-service-${spring.profiles.active}.yaml
             group: xuecheng-plus-project
             refresh: true
         shared-configs:
-          - data-id: logging-dev.yaml
+          - data-id: swagger-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
+          - data-id: logging-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+  profiles:
+    active: dev
 # 日志文件配置路径
 #logging:
 #  config: classpath:log4j2-dev.xml
