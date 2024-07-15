@@ -36,6 +36,8 @@ public class CoursePublishController {
     }
 
 
+
+
     @ResponseBody
     @PostMapping("/courseaudit/commit/{courseId}")
     public void commitAudit(@PathVariable("courseId") Long courseId){
