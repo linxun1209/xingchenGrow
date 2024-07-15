@@ -17,6 +17,8 @@ import com.xuecheng.content.model.po.CoursePublishPre;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
+import com.xuecheng.messagesdk.model.po.MqMessage;
+import com.xuecheng.messagesdk.service.MqMessageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
  @Autowired
  CoursePublishMapper coursePublishMapper;
+
+
+ @Autowired
+ MqMessageService mqMessageService;
 
 
  @Override
@@ -117,8 +123,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
   coursePublishPre.setStatus("202003");
   //教学机构id
   coursePublishPre.setCompanyId(companyId);
-  //提交时间
-  coursePublishPre.setCreateDate(LocalDateTime.now());
+  //审核时间
+  coursePublishPre.setAuditDate(LocalDateTime.now());
   CoursePublishPre coursePublishPreUpdate = coursePublishPreMapper.selectById(courseId);
   if(coursePublishPreUpdate == null){
    //添加课程预发布记录
@@ -213,6 +219,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
   * @date 2022/9/20 16:32
   */
  private void saveCoursePublishMessage(Long courseId){
+  MqMessage mqMessage = mqMessageService.addMessage("course_publish", String.valueOf(courseId), null, null);
+  if (mqMessage == null) {
+   XueChengPlusException.cast("添加消息记录失败");
+  }
 
 
  }

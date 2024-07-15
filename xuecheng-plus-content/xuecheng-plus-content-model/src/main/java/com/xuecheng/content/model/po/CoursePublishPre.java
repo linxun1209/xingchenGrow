@@ -121,7 +121,7 @@ public class CoursePublishPre implements Serializable {
     /**
      * 审核时间
      */
-    private Date auditDate;
+    private LocalDateTime auditDate;
 
     /**
      * 状态
