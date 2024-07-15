@@ -3,6 +3,8 @@ package com.xuecheng.content.service.impl;
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.config.MultipartSupportConfig;
+import com.xuecheng.content.feignclient.MediaServiceClient;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.mapper.CoursePublishMapper;
@@ -19,21 +21,33 @@ import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MqMessageService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * @description TODO
+ * @description 课程发布实现类
  * @author Mr.M
  * @date 2022/9/16 15:37
  * @version 1.0
  */
 @Service
+@Slf4j
 public class CoursePublishServiceImpl implements CoursePublishService {
 
  @Autowired
@@ -41,6 +55,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
  @Autowired
  TeachplanService teachplanService;
+
+
+ @Autowired
+ private MediaServiceClient mediaServiceClient;
 
 
  @Autowired
@@ -61,7 +79,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
 
  @Override
- public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
+public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
 
   //课程基本信息、营销信息
   CourseBaseInfoDto courseBaseInfo = courseBaseInfoService.getCourseBaseInfo(courseId);
@@ -223,7 +241,58 @@ public class CoursePublishServiceImpl implements CoursePublishService {
   if (mqMessage == null) {
    XueChengPlusException.cast("添加消息记录失败");
   }
+ }
 
 
+ @Override
+ public File generateCourseHtml(Long courseId) {
+
+  //静态化文件
+  File htmlFile  = null;
+
+  try {
+   //配置freemarker
+   Configuration configuration = new Configuration(Configuration.getVersion());
+
+   //加载模板
+   //选指定模板路径,classpath下templates下
+   //得到classpath路径
+   String classpath = this.getClass().getResource("/").getPath();
+   configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+   //设置字符编码
+   configuration.setDefaultEncoding("utf-8");
+
+   //指定模板文件名称
+   Template template = configuration.getTemplate("course_template.ftl");
+
+   //准备数据
+   CoursePreviewDto coursePreviewInfo = this.getCoursePreviewInfo(courseId);
+
+   Map<String, Object> map = new HashMap<>();
+   map.put("model", coursePreviewInfo);
+
+   //静态化
+   //参数1：模板，参数2：数据模型
+   String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+//            System.out.println(content);
+   //将静态化内容输出到文件中
+   InputStream inputStream = IOUtils.toInputStream(content);
+   //创建静态化文件
+   htmlFile = File.createTempFile("course",".html");
+   log.debug("课程静态化，生成静态文件:{}",htmlFile.getAbsolutePath());
+   //输出流
+   FileOutputStream outputStream = new FileOutputStream(htmlFile);
+   IOUtils.copy(inputStream, outputStream);
+  } catch (Exception e) {
+   e.printStackTrace();
+  }
+
+  return htmlFile;
+ }
+
+ @Override
+ public void uploadCourseHtml(Long courseId, File file) {
+  MultipartFile multipartFile = MultipartSupportConfig.getMultipartFile(file);
+  String course = mediaServiceClient.uploadFile(multipartFile, "course", courseId+".html");
  }
 }
