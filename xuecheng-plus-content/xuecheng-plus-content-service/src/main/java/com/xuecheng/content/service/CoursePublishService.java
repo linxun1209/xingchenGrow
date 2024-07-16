@@ -61,4 +61,12 @@ public interface CoursePublishService {
   */
  public void  uploadCourseHtml(Long courseId, File file);
 
+ /**
+  * 新增课程索引
+  *
+  * @param courseId 课程id
+  * @return 新增成功返回 true，否则 false
+  */
+ Boolean saveCourseIndex(Long courseId);
+
 }

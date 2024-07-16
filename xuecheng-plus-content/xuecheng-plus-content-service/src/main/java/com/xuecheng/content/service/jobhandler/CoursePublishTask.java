@@ -101,10 +101,22 @@ public class CoursePublishTask extends MessageProcessAbstract {
     //保存课程索引信息
     public void saveCourseIndex(MqMessage mqMessage,long courseId){
         log.debug("保存课程索引信息,课程id:{}",courseId);
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
+        //消息id
+        Long id = mqMessage.getId();
+        //消息处理的service
+        MqMessageService mqMessageService = this.getMqMessageService();
+        //消息幂等性处理
+        int stageTwo = mqMessageService.getStageTwo(id);
+        if(stageTwo == 2){
+            log.debug("课程索引已处理直接返回，课程id:{}",courseId);
+            return ;
+        }
+
+        Boolean result = coursePublishService.saveCourseIndex(courseId);
+        if(result){
+            //保存第一阶段状态
+            mqMessageService.completedStageTwo(id);
         }
 
     }

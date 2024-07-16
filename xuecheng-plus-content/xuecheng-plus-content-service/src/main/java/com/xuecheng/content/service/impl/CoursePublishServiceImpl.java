@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.config.MultipartSupportConfig;
 import com.xuecheng.content.feignclient.MediaServiceClient;
+import com.xuecheng.content.feignclient.SearchServiceClient;
+import com.xuecheng.content.feignclient.model.CourseIndex;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.mapper.CoursePublishMapper;
@@ -59,6 +61,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
  @Autowired
  private MediaServiceClient mediaServiceClient;
+
+
+ @Autowired
+ private SearchServiceClient searchServiceClient;
 
 
  @Autowired
@@ -229,6 +235,24 @@ public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
 
  }
 
+
+ @Override
+ public Boolean saveCourseIndex(Long courseId) {
+
+  //取出课程发布信息
+  CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+  //拷贝至课程索引对象
+  CourseIndex courseIndex = new CourseIndex();
+  BeanUtils.copyProperties(coursePublish,courseIndex);
+  //远程调用搜索服务api添加课程信息到索引
+  Boolean add = searchServiceClient.add(courseIndex);
+  if(!add){
+   XueChengPlusException.cast("添加索引失败");
+  }
+  return add;
+
+ }
+
  /**
   * @description 保存消息表记录，稍后实现
   * @param courseId  课程id
@@ -257,10 +281,12 @@ public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
    //加载模板
    //选指定模板路径,classpath下templates下
    //得到classpath路径
-   String classpath = this.getClass().getResource("/").getPath();
-   configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+
+   //String classpath = this.getClass().getResource("/").getPath();
    //设置字符编码
    configuration.setDefaultEncoding("utf-8");
+   configuration.setDirectoryForTemplateLoading(new File("E:\\后端大佬成才之路\\星辰成长项目\\星辰成长项目仓库代码\\xingchenGrow\\xuecheng-plus-content\\xuecheng-plus-content-service\\target\\classes\\templates"));
+
 
    //指定模板文件名称
    Template template = configuration.getTemplate("course_template.ftl");
@@ -293,6 +319,9 @@ public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
  @Override
  public void uploadCourseHtml(Long courseId, File file) {
   MultipartFile multipartFile = MultipartSupportConfig.getMultipartFile(file);
-  String course = mediaServiceClient.uploadFile(multipartFile, "course", courseId+".html");
+  String course = mediaServiceClient.upload(multipartFile, "course", courseId+".html");
+  if (course == null) {
+   XueChengPlusException.cast("远程调用媒资服务上传文件失败");
+  }
  }
 }
